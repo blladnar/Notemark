@@ -1,0 +1,13 @@
+CACHE MANIFEST
+
+# Version 1.0.1
+
+CACHE:
+http://fredandrandall.com/Notemark/index.html
+http://fredandrandall.com/Notemark/css/bootstrap.css
+https://code.jquery.com/jquery-1.10.2.min.js
+http://fredandrandall.com/Notemark/js/bootstrap.min.js
+http://fredandrandall.com/Notemark/NoteMarkLogo.png
+
+NETWORK:
+*

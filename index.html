@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en" manifest="http://fredandrandall.com/Notemark/cache.manifest">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
+	<link rel="apple-touch-icon" sizes="120x120" href="NoteMarkLogo.png">
+    <title>Notemark</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+
+    <!-- Just for debugging purposes. Don't actually copy this line! -->
+    <!--[if lt IE 9]><script src="../../docs-assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+    <style>
+    body {
+  padding-top: 10px;
+}
+.starter-template {
+  padding: 40px 5px;
+  text-align: center;
+}
+
+    </style>
+    
+
+  </head>
+
+  <body onload="load()">
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          &nbsp;&nbsp;<img src="NoteMarkLogo.png" width="50" height="50">&nbsp;&nbsp;
+        </div>
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="#about" data-toggle="modal" data-target="#aboutModal">About</a></li>
+            <li><a href="#contact" data-toggle="modal" data-target="#contactModal">Contact</a></li>
+            <li><form class="navbar-form" role="form">
+            	<button type="button" class="btn btn-primary" onclick="newNote()" data-toggle="collapse" data-target=".navbar-collapse">New</button>
+            	<button type="button" class="btn btn-info" onclick="deleteNote()" data-toggle="collapse" data-target=".navbar-collapse">Delete</button>
+            </form></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+    <div class="container">
+      <div class="starter-template" id="container">
+        <h1>Notemark</h1>
+        <textarea class="form-control" rows=10 id="noteArea"></textarea>
+        <br/>
+        <button type="button" class="btn btn-primary" onclick="save()">Save</button>
+        <br/>
+        <br/>
+      </div>
+      
+      <table id="noteTable">
+      </table>
+
+    </div><!-- /.container -->
+	
+	<!-- Modal -->
+	<div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+	        <h4 class="modal-title" id="myModalLabel">About</h4>
+	      </div>
+	      <div class="modal-body">
+	        Notemark is an app that lets you save notes as app icons on your homescreen. It uses HTML5 local storage and application caching so the notes will work offline.<br/><br/>
+	        The first word of your note will be the note's title.
+	        
+	      </div>
+	    </div><!-- /.modal-content -->
+	  </div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+	
+	<!-- Modal -->
+	<div class="modal fade" id="contactModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+	        <h4 class="modal-title" id="myModalLabel">Contact</h4>
+	      </div>
+	      <div class="modal-body">
+	        Contact me on twitter <a href="https://twitter.com/randallwbrown">@randallwbrown</a>.<br/>
+	        <br/>
+	        If you want to see more of my stuff check out <a href="http://fredandrandall.com/blog">my blog.</a>
+	      </div>
+	    </div><!-- /.modal-content -->
+	  </div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+
+    <script>
+    function loadPageVar (sVar) {  
+	  return unescape(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + escape(sVar).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));  
+	}
+	
+	function deleteNote()
+	{
+		if (confirm('Are you sure you want to delete this note?')) 
+		{
+		    localStorage.removeItem(nextKey);
+			document.getElementById("noteArea").value = "";
+			window.history.replaceState('Object', 'Title', '/Notemark/');
+			
+			var container = document.getElementById("container");
+			var button = document.getElementById(nextKey);
+			container.removeChild(button);
+			
+			nextKey = 0;
+			while( localStorage[nextKey] )
+			{
+				nextKey++;	
+			}
+			
+			
+		}
+		
+	}
+	
+	function newNote()
+	{
+		document.getElementById("noteArea").value = "";
+		while( localStorage[nextKey] )
+		{
+			nextKey++;	
+		}
+		showHomeScreenLink();	
+	}
+	
+	function showHomeScreenLink()
+	{	
+		window.history.replaceState('Object', 'Title', '/Notemark/?key=' + nextKey);
+	}
+	
+	function save()
+	{		
+		var buttonTitle;
+		var noteValue = document.getElementById("noteArea").value;
+		
+		if( !localStorage[nextKey] )
+		{
+			var link = document.getElementById("container");
+	
+			var button = document.createElement("button");
+			button.className = "btn btn-info";
+			button.style.width="100%";
+			button.type="button";
+			button.key = nextKey;
+			button.id = nextKey;
+			button.noteValue = document.getElementById("noteArea").value;
+			
+			var titleEnd = button.noteValue.indexOf('\n');
+			if( titleEnd == -1 )
+			{
+				titleEnd = button.noteValue.indexOf(' ');
+				if( titleEnd == -1 )
+				{
+					titleEnd = button.noteValue.length;	
+				}
+			}
+			
+			buttonTitle = button.noteValue.substring(0, titleEnd);
+			button.innerHTML = buttonTitle;
+			button.addEventListener("click", function(e){ 
+					document.getElementById("noteArea").value=localStorage[e.target.key];
+					nextKey = e.target.key;
+					showHomeScreenLink();
+					window.scrollTo(0, 0);
+					document.title = getButtonTitle();
+				}, false);
+				
+			link.appendChild(document.createElement("br"));
+			link.appendChild(document.createElement("br"));
+			link.appendChild(button);
+			
+		}
+		else
+		{
+			var titleEnd = noteValue.indexOf('\n');
+			if( titleEnd == -1 )
+			{
+				titleEnd = noteValue.indexOf(' ');
+				if( titleEnd == -1 )
+				{
+					titleEnd = noteValue.length;	
+				}
+			}
+			
+			buttonTitle = noteValue.substring(0, titleEnd);
+			document.getElementById(nextKey).innerHTML = buttonTitle;
+		}
+		document.title = buttonTitle;
+		localStorage[nextKey] = noteValue;
+
+		showHomeScreenLink();
+		
+	}
+	
+	function getButtonTitle()
+	{
+			var noteValue = localStorage[nextKey];
+			var titleEnd = noteValue.indexOf('\n');
+			if( titleEnd == -1 )
+			{
+				titleEnd = noteValue.indexOf(' ');
+				if( titleEnd == -1 )
+				{
+					titleEnd = noteValue.length;	
+				}
+			}
+			
+			return noteValue.substring(0, titleEnd);
+	}
+	
+	function load()
+	{
+		document.title = getButtonTitle();	
+	}
+	
+	function createNoteList()
+	{
+		var link = document.getElementById("container");
+	
+	
+		for( var i=0; i < localStorage.length; i++ )
+		{
+			var button = document.createElement("button");
+			button.className = "btn btn-info";
+			button.style.width="100%";
+			button.type="button";
+			button.key = localStorage.key(i);
+			button.id = localStorage.key(i);
+			button.noteValue = localStorage[localStorage.key(i)];
+			
+			var buttonTitle;
+			var titleEnd = button.noteValue.indexOf('\n');
+			if( titleEnd == -1 )
+			{
+				titleEnd = button.noteValue.indexOf(' ');
+				if( titleEnd == -1 )
+				{
+					titleEnd = button.noteValue.length;	
+				}
+			}
+			button.innerHTML = button.noteValue.substring(0, titleEnd);
+			button.addEventListener("click", function(e){
+					document.getElementById("noteArea").value=localStorage[e.target.key];
+					nextKey = e.target.key;
+					showHomeScreenLink();
+					window.scrollTo(0, 0);
+					document.title = getButtonTitle();
+				}, false);
+				
+			button.onClick=function(){ alert(i); };
+			link.appendChild(document.createElement("br"));
+			link.appendChild(document.createElement("br"));
+			link.appendChild(button);
+	
+		}
+	}
+	
+	var pageKey = loadPageVar("key");
+	if( pageKey )
+	{
+		nextKey = pageKey;
+		
+		if( localStorage[nextKey] )
+		{
+			showHomeScreenLink();
+		}
+	}
+	else
+	{
+		nextKey = 0;
+		while( localStorage[nextKey] )
+		{
+			nextKey++;	
+		}
+	}
+	
+	
+	var noteValue = localStorage[nextKey];
+	if( noteValue )
+	{
+		document.getElementById("noteArea").value=localStorage[nextKey];
+	}
+	
+	createNoteList();
+    
+    </script>
+    <script>
+	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	
+	  ga('create', 'UA-19767469-5', 'fredandrandall.com');
+	  ga('send', 'pageview');
+	
+	</script>
+  </body>
+</html>
